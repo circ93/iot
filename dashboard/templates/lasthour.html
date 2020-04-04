@@ -1,0 +1,105 @@
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="#">Dashboard Aws IoT</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+            aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>Live
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" onclick="redirect()">Live</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Last Hour <span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container-lg">
+    <div class="row">
+        <div class="col-md-11" id="temperature"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-11" id="humidity"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-11" id="wind_direction"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-11" id="wind_intensity"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-11" id="rain_height"></div>
+    </div>
+
+    <div class="result"></div>
+
+    <script>
+        function redirect() {
+            $(location).attr('href', '/');
+        }
+
+        function readDataLastHour(cb) {
+            $.get("/datalasthour", function (data) {
+                data = data.replace(/'/g, '"');
+                var lastdata = JSON.parse(data);
+                cb(lastdata);
+            });
+        }
+
+
+        function graph(title, id_div, color1, color2) {
+            var layout = {
+                title: title
+            };
+
+            function extractData(dataToPlot, stationID, property) {
+                var stationData = dataToPlot.filter((sensorData) => {
+                    return sensorData.id == stationID
+                });
+                var propertyData = stationData.map((sensorData) => {
+                    return sensorData[property]
+                });
+                return propertyData;
+            }
+
+            function innerPlot(dataToPlot) {
+                Plotly.plot(id_div, [{
+                    y: extractData(dataToPlot, 1, id_div),
+                    mode: 'lines+markers',
+                    name: 'station_1',
+                    marker: {color: color1, size: 8},
+                    line: {width: 4}
+                }, {
+                    y: extractData(dataToPlot, 2, id_div),
+                    mode: 'lines+markers',
+                    name: 'station_2',
+                    marker: {color: color2, size: 8},
+                    line: {width: 4}
+                }], layout);
+            }
+
+            readDataLastHour(function (data) {
+                innerPlot(data);
+            });
+        }
+
+        graph('Temperature', 'temperature', 'red', 'blue');
+        graph('Umidity', 'humidity', 'yellow', 'black');
+        graph('Wind Direction', 'wind_direction', 'green', 'grey');
+        graph('Wind Intensity', 'wind_intensity', 'gold', 'cyan');
+        graph('Rain Height', 'rain_height', 'brown', 'coral');
+    </script>
+
+</div>
+</body>
+</html>
