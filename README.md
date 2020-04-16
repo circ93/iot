@@ -11,3 +11,10 @@ https://www.hackster.io/circ_93/2-simulate-weather-station-using-the-iot-be7235
 
 Video link:
 https://www.youtube.com/watch?v=EvmBWpTYuRo
+
+# Assignment3
+Blog link:
+https://www.hackster.io/circ_93/3-simulate-weather-station-using-the-iot-2c5ec0
+
+Video link:
+https://www.youtube.com/watch?v=6UrHxt6TBTc
